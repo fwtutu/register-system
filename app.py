@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
 # Database connection
 conn = config.connect_to_database()
+
+# Password validation function
+def is_valid_password(password):
+    return re.match(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', password)
 
 # Route for the registration page
 @app.route('/register', methods=['GET', 'POST'])
@@ -19,6 +24,11 @@ def register():
         # Check if the passwords match
         if password != password_check:
             flash("請確認密碼是否輸入正確")
+            return render_template('register.html')
+        
+        # Validate password strength
+        if not is_valid_password(password):
+            flash("密碼至少需要8碼且須包含至少一位英文和一位數字")
             return render_template('register.html')
         
         cursor = conn.cursor(dictionary=True)

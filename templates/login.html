@@ -3,26 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>登入介面</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Log In</h1>
-    <h2>你可以選擇登入或是註冊帳號~</h2>
-    <form method="post" action="{{ url_for('login') }}">
-        帳號：
-        <input type="text" name="username" required><br/><br/>
-        密碼：
-        <input type="password" name="password" required><br><br>
-        <input type="submit" value="登入" name="submit"><br><br>
-        <a href="{{ url_for('register') }}">還沒有帳號？現在就註冊！</a>
-    </form>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Log In</h1>
+        <h2>你可以選擇登入或是註冊帳號~</h2>
+        <form method="post" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">帳號：</label>
+                <input type="text" name="username" class="form-control" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼：</label>
+                <input type="password" name="password" class="form-control" id="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">登入</button>
+        </form>
+        <a href="{{ url_for('register') }}" class="btn btn-link mt-3">還沒有帳號？現在就註冊！</a>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-warning mt-4">
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
