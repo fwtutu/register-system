@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 import config
 import re
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -12,6 +13,11 @@ conn = config.connect_to_database()
 # Password validation function
 def is_valid_password(password):
     return re.match(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', password)
+
+@app.route('/')
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 # Route for the registration page
 @app.route('/register', methods=['GET', 'POST'])
@@ -54,7 +60,7 @@ def register():
     return render_template('register.html')
 
 # Route for the login page
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -80,8 +86,55 @@ def login():
 def welcome():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
+    
     username = session['username']
-    return render_template('welcome.html', username=username)
+    user_id = session['id']
+    
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT COUNT(*) AS checkin_count FROM checkin WHERE user_id = %s", (user_id,))
+    checkin_count = cursor.fetchone()['checkin_count']
+    cursor.close()
+    
+    remaining_time = session.get('remaining_time', None)
+    
+    return render_template('welcome.html', username=username, checkin_count=checkin_count, remaining_time=remaining_time)
+
+
+
+
+# Check-in route
+@app.route('/checkin', methods=['POST'])
+def checkin():
+    if 'loggedin' not in session:
+        return redirect(url_for('login'))
+    
+    user_id = session['id']
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get the last check-in time
+    cursor.execute("SELECT checkin_time FROM checkin WHERE user_id = %s ORDER BY checkin_time DESC LIMIT 1", (user_id,))
+    last_checkin = cursor.fetchone()
+    
+    if last_checkin:
+        last_checkin_time = last_checkin['checkin_time']
+        now = datetime.now()
+        difference = now - last_checkin_time
+        if difference < timedelta(minutes=10):
+            remaining_time = 10 - (difference.seconds // 60)
+            session['remaining_time'] = remaining_time
+            return redirect(url_for('welcome'))
+    
+    # Insert new check-in record
+    cursor.execute("INSERT INTO checkin (user_id) VALUES (%s)", (user_id,))
+    conn.commit()
+    cursor.close()
+    
+    session.pop('remaining_time', None)
+    flash("簽到成功!")
+    return redirect(url_for('welcome'))
+
+
+
 
 # Logout route
 @app.route('/logout')

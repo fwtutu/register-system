@@ -4,10 +4,36 @@
     <meta charset="UTF-8">
     <title>歡迎頁面</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('https://thumb.photo-ac.com/56/564d7708097fcf9e3afc35d896da492d_w.jpeg'); /* 線上圖片的網址 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* 這裡是為了讓表單顯示更清晰，你可以根據需要調整透明度 */
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1>你好 {{ username }}</h1>
+        <p>您已經簽到 {{ checkin_count }} 次</p>
+        <form action="{{ url_for('checkin') }}" method="post">
+        <button type="submit" class="btn btn-primary ">簽到</button>
+        </form>
+        
+        {% if remaining_time %}
+            <p>您已於最近簽到，請再過 {{ remaining_time }} 分鐘後再試。</p>
+        {% endif %}
         <a href="{{ url_for('logout') }}" class="btn btn-primary mt-3">登出</a>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

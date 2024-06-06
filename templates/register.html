@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <title>會員註冊</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('https://thumb.photo-ac.com/56/564d7708097fcf9e3afc35d896da492d_w.jpeg'); /* 線上圖片的網址 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* 這裡是為了讓表單顯示更清晰，你可以根據需要調整透明度 */
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
     <script>
         function validateForm() {
             var password = document.forms["registerForm"]["password"].value;
@@ -39,6 +57,7 @@
             </div>
             <button type="submit" class="btn btn-primary">註冊</button>
             <button type="reset" class="btn btn-secondary">重設</button>
+            <a href="{{ url_for('home') }}" class="btn btn-link mt-3">回首頁</a>
         </form>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
